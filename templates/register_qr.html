@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  #html5-qrcode-button-camera-permission{
+    font-weight: bolder;
+    border: 2px solid green;
+    background: green;
+    color: white;
+    padding: 2px;
+    text-decoration: underline;
+  }
+</style>
+
+  <div class="container mx-auto mt-20">
+    <div class="bg-white text-gray-800 mx-auto mt-8 p-8 rounded-lg shadow-lg max-w-md">
+      <h1 class="text-4xl font-bold text-center mb-6">Register</h1>
+      
+      <!-- Success Message -->
+      <div id="success-message" class="hidden bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6" role="alert">
+        <strong class="font-bold">Success!</strong>
+        <span class="block sm:inline" id="success-text"></span>
+      </div>
+      
+      <!-- Error Message -->
+      <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
+        <strong class="font-bold">Error!</strong>
+        <span class="block sm:inline" id="error-text"></span>
+      </div>
+
+      <!-- QR Code Section -->
+      <div class="flex justify-center mb-6">
+        <div class="w-72 h-72 bg-gray-100 rounded-lg shadow-inner flex items-center justify-center">
+          <div id="reader" class="w-full h-full"></div>
+        </div>
+      </div>
+      <script src="{% static 'js/html5-qrcode.min.js' %}"></script>
+      <script>
+        function onScanSuccess(decodedText, decodedResult) {
+          console.log(`Scan result: ${decodedText}`, decodedResult);
+        
+          // Parse the decoded text
+          const lines = decodedText.split('\n');
+          const data = {};
+          lines.forEach((line) => {
+            const [key, value] = line.split(': ');
+            data[key.toLowerCase()] = value;
+          });
+        
+          // Send the data to the server
+          fetch("{% url 'register_qr' %}", {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify(data)
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.success) {
+                document.getElementById('success-text').innerText = data.success;
+                document.getElementById('success-message').classList.remove('hidden');
+                document.getElementById('error-message').classList.add('hidden');
+              } else if (data.error) {
+                document.getElementById('error-text').innerText = data.error;
+                document.getElementById('error-message').classList.remove('hidden');
+                document.getElementById('success-message').classList.add('hidden');
+              }
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+              document.getElementById('error-text').innerText = 'An unexpected error occurred.';
+              document.getElementById('error-message').classList.remove('hidden');
+              document.getElementById('success-message').classList.add('hidden');
+            });
+        }
+        
+        var html5QrcodeScanner = new Html5QrcodeScanner('reader', { fps: 10, qrbox: 250 });
+        html5QrcodeScanner.render(onScanSuccess);
+        
+      </script>
+    </div>
+  </div>
+{% endblock %}

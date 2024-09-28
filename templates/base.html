@@ -1,0 +1,44 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IOAA-Jr 2024 - Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  </head>
+
+  <body class="bg-gradient-to-b from-blue-900 to-black text-white flex flex-col min-h-screen font-sans">
+    <nav class="navbar bg-purple-800 bg-opacity-90 p-4 shadow-md flex justify-between items-center">
+      <div class="flex items-center space-x-4">
+        <a href="/" class="text-2xl font-bold tracking-wide text-white hover:text-yellow-400 transition duration-300">IOAA-Jr. 2024</a>
+      </div>
+      <div class="space-x-4">
+        <a href="/" class="text-md text-white hover:text-yellow-400 transition duration-300 px-2 py-1 rounded">Home</a>
+
+        <a href="{% url 'login' %}" class="text-md text-white hover:text-yellow-400 transition duration-300 px-2 py-1 rounded">
+          {% if user.is_authenticated %}
+            View
+          {% else %}
+            Login
+          {% endif %}
+        </a>
+    
+        <a href="/contact/" class="text-md text-white hover:text-yellow-400 transition duration-300 px-2 py-1 rounded">Contact</a>
+      </div>
+    </nav>
+    <main class="flex-1 flex flex-col items-center justify-center pt-12 relative">
+      <div class="absolute inset-0 bg-cover bg-center opacity-50" style="background-image: url('{% static 'images/stars.jpg' %}'); z-index: -1;"></div>
+      <div class="text-block bg-white bg-opacity-20 backdrop-blur-lg max-w-lg p-6 rounded-lg shadow-lg text-center">
+        {% block content %}
+
+        {% endblock %}
+      </div>
+    </main>
+    <footer class="bg-purple-800 bg-opacity-90 text-center py-4">
+      <p class="text-sm text-white">&copy; 2024 Suwarna Pyakurel, Nepal Astronomical Society. All rights reserved.</p>
+    </footer>
+    <script src="{% static 'js/html5-qrcode.min.js' %}"></script>
+  </body>
+</html>
